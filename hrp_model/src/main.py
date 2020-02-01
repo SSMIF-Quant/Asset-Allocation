@@ -30,5 +30,12 @@ from alpha_vantage.timeseries import TimeSeries
 import ffn
 import config
 
+#up first, correlation clustering functions
+# lets see if we can use fabia biclustering
 if "__name__" == __main__:
-    pass
+    data = dict()
+
+    clusters = correlationCluster(data)
+    qdiag = quasiDiagonalization(clusters)
+    allocations = recBisection(qdiag)
+    print(allocations)
