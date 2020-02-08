@@ -21,25 +21,25 @@ class Data_Collector():
         close_prices = yf.download(ticker, start=start, end=end)
         return close_prices["Adj Close"]
 
-    def get_correlation_matrix(self, a, b, na="_eq_1", nb="_eq_2", plot=False):
-        col_names_a = list(a.columns)
-        col_names_b = list(b.columns)
-        new_col_names_a = []
-        new_col_names_b = []
+    def rename_columns(self, a, name):
+        col_names = list(a.columns)
+        new_col_names = []
 
-        for index, _ in enumerate(col_names_a):
-            new_col_names_a.append(col_names_a[index] + na)
-            new_col_names_b.append(col_names_b[index] + nb)
-
-        rename_dict_a = dict()
-        rename_dict_b = dict()
+        for index, _ in enumerate(col_names):
+            new_col_names.append(col_names[index] + name)
         
-        for index, _ in enumerate(col_names_a):
-            rename_dict_a[col_names_a[index]] = new_col_names_a[index]
-            rename_dict_b[col_names_b[index]] = new_col_names_b[index]
+        rename_dict = dict()
 
-        a = a.rename(columns=rename_dict_a)
-        b = b.rename(columns=rename_dict_b)
+        for index, _ in enumerate(col_names):
+            rename_dict[col_names[index]] = new_col_names[index]
+        
+        a = a.rename(columns=rename_dict)
+        return a
+
+    def get_correlation_matrix(self, a, b, na="_eq_1", nb="_eq_2", plot=False):
+
+        a = self.rename_columns(a, name=na)
+        b = self.rename_columns(b, name=nb)
 
         df = pd.concat([a, b], axis=1, sort=False)
 
@@ -49,4 +49,13 @@ class Data_Collector():
             pt.show()
         
         return corr_matrix
+
+    def get_covariance_matrix(self, a, name="_eq_1", plot=False):
+        cov_matrix = a.cov()
+        if(plot == True):
+            sns.heatmap(cov_matrix, annot=True)
+            pt.show()
+    
+    def get_capm()
+        return cov_matrix
     
