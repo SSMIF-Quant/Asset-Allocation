@@ -27,6 +27,7 @@ if __name__ == "__main__":
     #print(snp_data)
     print(data_col.get_volatility(msft_data, "Adj Close"))
     print(msft_data)
+    print(data_col.get_capm(msft_data, .02))
     # djia_equtities = data_col.get_ticker_stats(["AXP", "AAPL", "BA", "CAT", "CVX", "KO", "CSCO", "DIS"], start=start, end=end)
     # bench = Benchmarker(djia_equtities)
     # hist_returns_csco = bench.calculate_historical_returns("CSCO", basis="Volume")

@@ -68,6 +68,13 @@ class Data_Collector():
         
         return residuals
 
+    def get_percent_change(self, target):
+        residuals = [0]
+        for i in range(1, len(target)):
+            residuals.append(((target[i] - target[i-1])/target[i-1]) * 100)
+        
+        return residuals
+
     def get_volatility(self, ticker, basis):
         target_column = self.get_target_column(ticker, basis)
         residuals = self.get_residuals(target_column)
@@ -75,10 +82,33 @@ class Data_Collector():
 
         return volatility
 
-    def get_capm(self, equity, rf):
-        pass
-        # start = str(equity.index.values[0]).split("T")[0]
-        # end = str(equity.index.values[-1]).split("T")[0]
-        # snp_data = self.get_ticker_stats("^GSPC", start=start, end=end)
+    def get_capm(self, equity, rf, basis="Adj Close"):
+        #for the market returns we will use historical returns over the time period
+        #of the data given
+        start = str(equity.index.values[0]).split("T")[0]
+        end = str(equity.index.values[-1]).split("T")[0]
+        snp_data = self.get_ticker_stats("^GSPC", start=start, end=end)
+
+        target_column = self.get_target_column(equity, basis)
+        market_column = self.get_target_column(snp_data, basis)
+        #these are historical returns
+        #target_returns = (target_column[-1] - target_column[0]) / (target_column[0])
+        market_return = (snp_data[basis][-1] - snp_data[basis][0]) / (snp_data[basis][0])
+        #target_risk_premium = target_returns - rf
+        market_risk_premium  = market_return - rf
+
+        #beta = cov(r_a, r_m) / var(r_m)
+        target_residuals = self.get_percent_change(target_column)
+        market_residuals = self.get_percent_change(market_column)
+        df = pd.DataFrame({"Asset Returns" : target_residuals, "Market Returns" : market_residuals})
+        cov = df.cov()
+        var = np.std(market_residuals)
+        beta = cov / var
+
+        capm = rf + beta * (market_risk_premium) 
+
+        return cov
+
+       
         # benchmark_vol = self.get_volatility(snp_data, basis="Adj Close")
     
