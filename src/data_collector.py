@@ -55,7 +55,30 @@ class Data_Collector():
         if(plot == True):
             sns.heatmap(cov_matrix, annot=True)
             pt.show()
-    
-    def get_capm()
+        
         return cov_matrix
+
+    def get_target_column(self, equity, basis):
+        return equity[basis].values
+
+    def get_residuals(self, target):
+        residuals = [0]
+        for i in range(1, len(target)):
+            residuals.append(target[i] - target[i-1])
+        
+        return residuals
+
+    def get_volatility(self, ticker, basis):
+        target_column = self.get_target_column(ticker, basis)
+        residuals = self.get_residuals(target_column)
+        volatility = np.std(residuals)
+
+        return volatility
+
+    def get_capm(self, equity, rf):
+        pass
+        # start = str(equity.index.values[0]).split("T")[0]
+        # end = str(equity.index.values[-1]).split("T")[0]
+        # snp_data = self.get_ticker_stats("^GSPC", start=start, end=end)
+        # benchmark_vol = self.get_volatility(snp_data, basis="Adj Close")
     
