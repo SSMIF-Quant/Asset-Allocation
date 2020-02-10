@@ -21,7 +21,7 @@ class Benchmarker():
         
         return target_column
 
-    def calculate_historical_returns(self, ticker, basis="Adj Close"):
+    def get_historical_returns(self, ticker, basis="Adj Close"):
         target_column = self.get_target_column(self._equities, ticker, basis)
         hist_returns = target_column[-1] - target_column[0]
 
