@@ -77,13 +77,21 @@ class Data_Collector():
 
     def get_volatility(self, ticker, basis):
         target_column = self.get_target_column(ticker, basis)
-        residuals = self.get_residuals(target_column)
-        volatility = np.std(residuals)
+        #residuals = self.get_residuals(target_column)
+        #volatility = np.std(residuals)
+        # mean = np.mean(target_column)
+        # residuals = []
+        # sum = 0
+        # for price in target_column:
+        #     residuals.append((price - mean)**2)
+        # for price in residuals:
+        #     sum += price
+        # volatility = np.sqrt(sum / len(target_column))
 
-        return volatility
+        return np.std(target_column)
 
     def get_historical_returns(self, equity, basis="Adj Close"):
-        return equity[basis][-1] - equity[basis][0]
+        return ((equity[basis][-1] - equity[basis][0]) / equity[basis][0]) * 100
 
     def get_capm(self, equity, rf, basis="Adj Close"):
         #for the market returns we will use historical returns over the time period
@@ -105,12 +113,22 @@ class Data_Collector():
         market_residuals = self.get_percent_change(market_column)
         df = pd.DataFrame({"Asset Returns" : target_residuals, "Market Returns" : market_residuals})
         
-        corr = df.corr().values[1][0]
-        var_target = np.std(target_residuals)
-        var_market = np.std(market_residuals)
-        beta = corr * (var_target/var_market)
+        x_bar = np.mean(target_residuals)
+        y_bar = np.mean(market_residuals)
+        sum = 0
+        for i in range(len(target_column)):
+            sum += ((target_residuals[i] - x_bar)*(market_residuals[i] - y_bar))
+        cov = sum/len(target_column-1)
+
+        var = np.std(market_residuals)**2
+
+        beta = cov / var
+        # corr = df.corr().values[1][0]
+        # var_target = self.get_volatility(target_residuals)**2
+        # var_market = self.get_volatility(market_residuals)**2
+        # beta = corr * (var_target/var_market)
 
         capm = rf + beta * (market_risk_premium) 
 
-        return capm
+        return capm, beta, market_risk_premium
     
