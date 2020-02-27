@@ -69,4 +69,8 @@ P = [[0,0,0,0,0,0,1,0],
 #from P that corresponds to the kth view and E is the covariance matrix of excess returns
 #and pk' is the transpose of the row vector pk
 
+#THIS IS THE VARIANCE THAT FORMS OMEGA (O)
+
+#The constant t can be caluclated a number of ways as can the variance of the error terms 
+
 
