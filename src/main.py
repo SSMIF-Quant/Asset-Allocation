@@ -46,6 +46,27 @@ Q = Q + e
 #this is very pseudo codey
 W = populateDiagonal(e.variance())
 
+#the expressed views from vector Q are matched to specific assets by matrix P - each expressed view results in a 
+#1xN vecotr where N is the number of assets under consideration by the model
+#Thus, K views result in a KxN matrix 
+#so if we have 3 views and 8 assets, we will have a 3x8 matrix
+#for our example, we will define our P
 
+P = [[0,0,0,0,0,0,1,0],
+    [-1,1,0,0,0,0,0,0],
+    [0,0,.9,-.9,.1,-.1,0,0]]
+
+#The values of the matrix are determined by setting the weighting of underperforming assets to negative and 
+#overperforming assets to positive
+#for relative views, the sum of the values of the matrix row for that view must be 0
+#the index within the row of the P matrix represents which asset is under consideration
+#so in the first row, the 1 represents the overperforming seventh asset i.e International Develped Equity
+
+#the values are from the magnitude of the relative market capitalization rates
+
+#Once matrix P is defined we can calculate the variance of and individual view portfoli.
+#The variance of an individual view portfolio is pkEpk' where pk is a single 1xN row vector 
+#from P that corresponds to the kth view and E is the covariance matrix of excess returns
+#and pk' is the transpose of the row vector pk
 
 
