@@ -7,6 +7,7 @@ import numpy as np
 import seaborn as sns
 import pandas_datareader as pdr
 import matplotlib.pyplot as pt
+from datetime import date
 
 def getDailyReturns(equity_df, basis="Adj Close"):
     returns = []
@@ -20,25 +21,13 @@ def getDailyReturns(equity_df, basis="Adj Close"):
     
     return returns
 
-# def getCovarianceMatrixOfReturns():
-#def getCovarianceMatrixOfReturns(lists):
 def getCovarianceMatrixOfReturns(equities, start, end, basis="Adj Close"):
 #This implementation is based off of this example https://stattrek.com/matrix-algebra/covariance-matrix.aspx
-
-    # basis_columns = []
-    
-    # for index, equity in enumerate(equities):
-    #     print(equity)
-    #     basis_columns.append(list(getTickerStats(equity, start=start, end=end)[0][basis].values))
-
-    # for index, col in enumerate(basis_columns):
-    #     basis_columns[index] = getPercentChange(col)
 
     equity_df = getTickerStats(equities, start=start, end=end)
 
     basis_columns = getDailyReturns(equity_df)
-    # for scores in lists:
-    #     basis_columns.append(scores)
+
 ########################################TESTING CONTENT############################################
 #each sub list represents a different "student's test scores" in math english and art
 
@@ -54,10 +43,6 @@ def getCovarianceMatrixOfReturns(equities, start, end, basis="Adj Close"):
 
     X = np.array(basis_columns).T.tolist()
 
-    print("\n#############################\n")
-    print("Raw Data:")
-    print(X)
-    
     #time for the math
     #first we will transform the raw data matrix X into deviation scores for matrix x
     #x = X - 11'X (1.0/n) where 
@@ -65,7 +50,6 @@ def getCovarianceMatrixOfReturns(equities, start, end, basis="Adj Close"):
     # vector of ones
 
     n = len(X)
-    print(n)
     #one = 11'
     one = np.ones((n,n))
 
@@ -79,28 +63,22 @@ def getCovarianceMatrixOfReturns(equities, start, end, basis="Adj Close"):
     #covariance matrix
     V  = np.multiply((1/n), dev_ss_cp)
 
-    print("\n#############################\n")
-    print("Variance-Covariance Matrix:")
-    print(V)
-    print("\n#############################\n")
-
     #V should be a k x k (num assets x num assets) variance covariance matrix (aka covariance matrix) for the 
     #columns input into the function
     #The diagonal of V is the variance of returns for each equity and the covariance is represented by the 
     #off diagonal elements of V
-    # sns.heatmap(V)
-    # pt.show()
+
     return V
 
-def getCovarianceMatrixOfReturns2(equities, start, end, basis="Adj Close"):
-    basis_df = pdr.DataReader(["STZ"], 'yahoo', start=start, end=end)[basis]
-    #V = np.multiply(basis_df.pct_change().dropna().cov(), (len(basis_df) - 1) / len(basis_df))
-    #print(V)
-    basis_col = basis_df["STZ"]
-    change = basis_col.pct_change()
-    variance = (change.std() * (len(change)-1)/(len(change)))**2
-    print(variance)    
-    #return V
+# def getCovarianceMatrixOfReturns2(equities, start, end, basis="Adj Close"):
+#     basis_df = pdr.DataReader(["STZ"], 'yahoo', start=start, end=end)[basis]
+#     #V = np.multiply(basis_df.pct_change().dropna().cov(), (len(basis_df) - 1) / len(basis_df))
+#     #print(V)
+#     basis_col = basis_df["STZ"]
+#     change = basis_col.pct_change()
+#     variance = (change.std() * (len(change)-1)/(len(change)))**2
+#     print(variance)    
+#     #return V
 
 def getTickerStats(tickers, start, end):
         equity_df = []
@@ -109,18 +87,26 @@ def getTickerStats(tickers, start, end):
         
         return equity_df
 
+def getRiskFreeRate(benchmark=["^IRX"], basis="Adj Close", start=date.today().strftime("%Y-%m-%d"), end=date.today().strftime("%Y-%m-%d")):
+    rf = getTickerStats(benchmark, start=start, end=end)
+    return rf[0][basis][-1]
+
+
+
+
 if __name__ == "__main__":
-    end = "2020-02-01"
+    # end = "2020-02-01"
+    end = date.today().strftime("%Y-%m-%d")
     start = "2020-01-01"
+
     # equities = ["HEDJ", "VZ", "STZ", "GOOG", "AMGN", "EMR", "GILD", "FMC"]
     equities = ["HEDJ", "VZ", "STZ", "GOOG", "EMR"]
-    market_caps = [1.63, 227.72, 33.64, 904.62, 131.4, 39.39, 91.18, 11.97]
-    #equity_df = getTickerStats(equities, start=start, end=end)
-    #print(equity_df)
-    #print(getCovarianceMatrixOfReturns(equity_df, basis="Adj Close"))
-    # getCovarianceMatrixOfReturns([[90, 60, 90], [90,90,30], [60,60,60], [60,60,90], [30,30,30]])
-    getCovarianceMatrixOfReturns(equities, start=start, end=end, basis="Adj Close" )
-    getCovarianceMatrixOfReturns2(equities, start=start, end=end, basis="Adj Close" )
-    #print(getDailyReturns(getTickerStats(["HEDJ"], start=start, end=end)))
-    #thing = getTickerStats(["HEDJ"], start=start, end=end)
-    #print(getDailyReturns(thing))
+    #market_caps = [1.63, 227.72, 33.64, 904.62, 131.4, 39.39, 91.18, 11.97]
+
+    market_caps = [1.63, 227.72, 33.64, 904.62, 131.4]
+    var_cov_matrix = getCovarianceMatrixOfReturns(equities, start=start, end=end, basis="Adj Close")
+    print("##############VARIANCE COVARIANCE MATRIX ###################\n")
+    print(var_cov_matrix)
+    print("\n###################################################\n")
+    rf = getRiskFreeRate()
+    print(rf)
